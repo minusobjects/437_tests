@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>437 4K Reduced</title>
+  <title>437 Controls</title>
   <link rel="stylesheet" href="../437-tests.css">
 </head>
 
@@ -13,9 +13,12 @@
       <button onclick="startRunning()">START</button>
       <button onclick="stopRunning()">STOP</button>
       <input id="charInput" style="margin-top:16px;"/>
-      <div id="charInfo" style="background-color:firebrick;padding:8px;">none</div>
       <button onclick="setChar()">SET CHAR</button>
+      <div id="charInfo" style="background-color:firebrick;padding:8px;">none</div>
     </div>
+  </div>
+  <div id="editorMap" style="margin-top:16px;padding:8px;font-size:12px;background-color:darkgoldenrod;">
+    editorMap
   </div>
 </body>
 <script>
@@ -49,13 +52,8 @@
     loadCounter++;
     if (loadCounter === charNames.length) {
       console.warn('loading finished, will initialize');
-      initialize();
+      createUI();
     }
-  };
-
-  const initialize = () => {
-    refreshCanvas();
-    createUI();
   };
 
   const chars = {};
@@ -99,6 +97,8 @@
   let yCoord = getRandom(yAmt) * height;
 
   const refreshCanvas = (currentDir) => {
+    if (!isRunning) return;
+    
     switch (currentDir) {
       case 'up':
         yCoord -= height;
@@ -199,42 +199,66 @@
 
   // editor UI
 
+  const editorMap = [];
+
+  for (i = 0; i < yAmt; i++) {
+    editorMap.push([]);
+    for (n = 0; n < xAmt; n++) {
+      editorMap[i].push(' ');
+    }
+  }
+
   const getBoxLocation = (mouseEvent) => {
     let startX = Math.floor(mouseEvent.offsetX - (mouseEvent.offsetX % width));
     let startY = Math.floor(mouseEvent.offsetY - (mouseEvent.offsetY % height));
     return [startX, startY];
   }
 
+  const addToEditorMap = (e) => {
+    const char = (currentChar === 'none') ? ' ' : currentChar;
+    const coords = getBoxLocation(e);
+    const xIdx = coords[0] / width;
+    const yIdx = coords[1] / height;
+    editorMap[yIdx][xIdx] = char;
+  }
+
+  const refreshEditorMap = () => {
+    document.getElementById('editorMap').innerText = editorMap.join('\n');
+
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    for (y = 0; y < yAmt; y++) {
+      for (x = 0; x < xAmt; x++) {
+        const char = editorMap[y][x];
+        if (char != ' ') {
+          img = chars[char];
+          ctx.drawImage(img, width * x, height * y, width, height);
+        }
+      }
+    }
+  }
+
   const createUI = () => {
+    refreshEditorMap();
+
     c.addEventListener('mousemove', e => {
       if (isRunning) return;
       // if this is commented-out, you can make some kinda-cool drawings on the canvas:
-      refreshCanvas();
+      refreshEditorMap();
       const boxLocation = getBoxLocation(e).concat([width, height]);
       ctx.beginPath();
       ctx.rect(...boxLocation);
-      const idx = getRandom(charNames.length);
-      const img = chars[charNames[idx]];
-      ctx.drawImage(img, ...boxLocation);
-      // if (isDrawing) {
-      //   addToEditorMap(e, currentItem);
-      // }
       ctx.stroke();
+      if (currentChar != 'none') {
+        const img = chars[currentChar];
+        ctx.drawImage(img, ...boxLocation);
+      }
     });
 
-    c.addEventListener('mousedown', () => {
-      // isDrawing = true;
-    });
-    c.addEventListener('mouseup', () => {
-      // isDrawing = false;
-    });
-    c.addEventListener('mouseout', () => {
-      // isDrawing = false;
-      refreshCanvas();
-    });
     c.addEventListener('click', e => {
-      // addToEditorMap(e, currentItem);
-      refreshCanvas();
+      if (isRunning) return;
+      addToEditorMap(e);
+      refreshEditorMap();
     });
   }
 
@@ -250,7 +274,6 @@
     }
     if (frame === 0) {
       refreshCanvas(currentDir);
-      // console.warn(currentDir)
       frame++;
     } else if (frame < FRAME_MAX) {
       frame++;
