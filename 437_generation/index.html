@@ -1,0 +1,166 @@
+<html>
+<head>
+  <title>437 Generation</title>
+  <link rel="stylesheet" href="../437-tests.css">
+</head>
+<body>
+  <div id="navBlock"><a href="../index.html">&lt;&lt;</a></div>
+  <canvas id="theCanvas" width="3840" height="2160"></canvas>
+</body>
+<!-- svg-data.js contains the svgData object -->
+<script src="svg-data.js"></script>
+<script>
+  const c = document.getElementById("theCanvas");
+  const ctx = c.getContext("2d");
+
+  const width = 8;
+  const height = 14;
+
+  const getRandom = (max) => {
+    return Math.floor(Math.random() * max);
+  }
+
+  const drawInitial = () => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    const xAmt = 480;
+    const yAmt = 154;
+    for (let y = 0; y < yAmt; y++) {
+      for (let x = 0; x < xAmt; x++) {
+        drawSingleRandomCharacter(x * width, y * height);
+      }
+    }
+  }
+
+  const colors = [
+    ['black', '#000000'],
+    ['blue', '#0000AA'],
+    ['green', '#00AA00'],
+    ['cyan', '#00AAAA'],
+    ['red', '#AA0000'],
+    ['magenta', '#AA00AA'],
+    ['brown', '#AA5500'],
+    ['lightGray', '#AAAAAA'],
+    ['brightBlack', '#555555'],
+    ['brightBlue', '#5555FF'],
+    ['brightGreen', '#55FF55'],
+    ['brightCyan', '#55FFFF'],
+    ['brightRed', '#FF5555'],
+    ['brightMagenta', '#FF55FF'],
+    ['brightYellow', '#FFFF55'],
+    ['brightWhite', '#FFFFFF'] 
+  ];
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+
+  const generateSvgWithColor = (d, colorCode) => {
+    const newSvg = document.createElementNS(svgNS, 'svg');
+    newSvg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
+    newSvg.setAttribute('viewBox', '0 0 8 14');
+    newSvg.setAttribute('fill', colorCode);
+    const newPath = document.createElementNS(svgNS, 'path');
+    newPath.setAttribute('d', d);
+    newSvg.appendChild(newPath);
+    const string = new XMLSerializer().serializeToString(newSvg);
+    const blob = new Blob([string], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const svgImg = new Image();
+    svgImg.onload = noteImageLoaded;
+    svgImg.src = url;
+    return svgImg;
+  }
+
+  const chars = {};
+
+  const generateCharsInColor = (svgObj) => {
+    const svgName = svgObj.name;
+    const d = svgObj.d;
+    colors.forEach((colorArr) => {
+      const colorName = colorArr[0];
+      const colorCode = colorArr[1];
+      const newImg = generateSvgWithColor(d, colorCode);
+      const charName = `${svgName}_${colorName}`;
+      chars[charName] = newImg;
+    });
+  }
+
+  // so, this works! but it also takes a while to load
+  const generateAllCharsFromData = () => {
+    console.warn('will generate characters');
+    svgData.forEach((svgObj) => {
+      generateCharsInColor(svgObj);
+    });
+  }
+
+  const totalImageCount = svgData.length * colors.length;
+
+  let imageLoadCounter = 0;
+
+  const noteImageLoaded = () => {
+    imageLoadCounter++;
+    console.warn(`character generation count: ${imageLoadCounter}/${totalImageCount}`);
+    if (imageLoadCounter === totalImageCount) {
+      console.warn('all characters loaded - drawing initial field');
+      drawInitial();
+      console.warn('initial field drawn - will start animation loop');
+      setTimeout(() => {
+        console.warn('starting animation loop');
+        animationLoop();
+      }, 3000);
+    }
+  }
+
+  const drawSingleRandomCharacter = (x, y) => {
+    const backgroundColorIdx = getRandom(colors.length);
+    let foregroundColorIdx = backgroundColorIdx;
+
+    while (foregroundColorIdx === backgroundColorIdx) {
+      foregroundColorIdx = getRandom(colors.length);
+    }
+
+    const backgroundColor = colors[backgroundColorIdx][1];
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(x, y, width, height);
+
+    const charName = svgData[getRandom(svgData.length)].name;
+    const colorName = colors[foregroundColorIdx][0];
+    const charKey = `${charName}_${colorName}`;
+    const char = chars[charKey];
+    ctx.drawImage(char, x, y, width, height);
+  }
+
+  const generateInitialCoords = () => {
+    const result = [];
+    for (let n = 0; n < 100; n++) {
+      const x = getRandom(480);
+      const y = getRandom(154);
+      result.push([x * width, y * height]);
+    }
+    return result;
+  }
+
+  const initialCoords = generateInitialCoords();
+
+  const changeChars = () => {
+    // now, let's try 100 rectangles of 50 each
+    for(let n = 0; n < 100; n++) {
+      const x = initialCoords[n][0];
+      const y = initialCoords[n][1];
+      ctx.clearRect(x, y, width * 10, height * 5);
+      for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 10; col++) {
+          let xCoord = x + (col * width);
+          let yCoord = y + (row * height);
+          drawSingleRandomCharacter(xCoord, yCoord);
+        }
+      }
+    }
+  }
+
+  const animationLoop = () => {
+    changeChars();
+    window.requestAnimationFrame(animationLoop);
+  }
+
+  generateAllCharsFromData();
+</script>
+</html>

@@ -1,0 +1,267 @@
+<html>
+
+<head>
+  <title>437 4K Reduced</title>
+  <link rel="stylesheet" href="../437-tests.css">
+</head>
+
+<body>
+  <div id="navBlock"><a href="../index.html">&lt;&lt;</a></div>
+  <div style="display:flex;">
+    <canvas id="theCanvas" width="480" height="350"></canvas>
+    <div style="background-color:burlywood;padding:8px;margin-left:16px;height:auto;display:flex;flex-direction:column;gap:8px;">
+      <button onclick="startRunning()">START</button>
+      <button onclick="stopRunning()">STOP</button>
+      <input id="charInput" style="margin-top:16px;"/>
+      <div id="charInfo" style="background-color:firebrick;padding:8px;">none</div>
+      <button onclick="setChar()">SET CHAR</button>
+    </div>
+  </div>
+</body>
+<script>
+  const charNames = [
+    '263a',
+    '263b',
+    '\!',
+    '\"',
+    '_pnd',
+    '\$',
+    '\%',
+    '\&',
+    '\'',
+    '\(',
+    '\)',
+    '\*',
+    '\+',
+    '\,',
+    '\-',
+    '_dot',
+    '_fsl',
+    '0',
+    '1',
+    '2'
+  ];
+
+  let loadCounter = 0;
+
+  // Note: there seems to be a bug in Chrome that keeps these console messages from showing sometimes
+  const incrementLoadCounter = () => {
+    loadCounter++;
+    if (loadCounter === charNames.length) {
+      console.warn('loading finished, will initialize');
+      initialize();
+    }
+  };
+
+  const initialize = () => {
+    refreshCanvas();
+    createUI();
+  };
+
+  const chars = {};
+
+  let currentChar = 'none';
+
+  charNames.forEach((name) => {
+    const img = new Image();
+    img.onload = () => {
+      incrementLoadCounter(name);
+    }
+    img.src = `../letter_svgs/${name}.svg`;
+    chars[name] = img;
+  });
+
+  const setChar = () => {
+    if (isRunning) return;
+    let name = document.getElementById('charInput').value;
+    if (chars[name]) {
+      currentChar = name;
+    } else {
+      currentChar = 'none';
+    }
+    document.getElementById("charInfo").innerText = currentChar;
+  }
+
+  const c = document.getElementById("theCanvas");
+  const ctx = c.getContext("2d");
+
+  const getRandom = (max) => {
+    return Math.floor(Math.random() * max);
+  }
+
+  const width = 8;
+  const height = 14;
+
+  const xAmt = 60;
+  const yAmt = 25;
+
+  let xCoord = getRandom(xAmt) * width;
+  let yCoord = getRandom(yAmt) * height;
+
+  const refreshCanvas = (currentDir) => {
+    switch (currentDir) {
+      case 'up':
+        yCoord -= height;
+        break;
+      case 'down':
+        yCoord += height;
+        break;
+      case 'left':
+        xCoord -= width;
+        break;
+      case 'right':
+        xCoord += width;
+        break;
+      default:
+        // do nothing
+    }
+
+    const idx = getRandom(charNames.length);
+    const img = chars[charNames[idx]];
+
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.drawImage(img, xCoord, yCoord, width, height);
+  }
+
+  // controls
+
+  const directions = {
+    up: 0,
+    down: 0,
+    left: 0,
+    right: 0
+  };
+  const allowedKeys = [37, 65, 38, 87, 39, 68, 40, 83];
+  const keyDirections = {
+    '37': 'left',
+    '65': 'left',
+    '38': 'up',
+    '87': 'up',
+    '39': 'right',
+    '68': 'right',
+    '40': 'down',
+    '83': 'down',
+  };
+
+  let activeIdx = 0;
+  const indices = {};
+
+  const FRAME_MAX = 3;
+  let frame = 0;
+
+  let isRunning = false;
+
+  const startRunning = () => {
+    if (isRunning) return;
+    addKeyboardListeners();
+    isRunning = true;
+    window.requestAnimationFrame(runLoop);
+  }
+
+  const stopRunning = () => {
+    if (!isRunning) return;
+    removeKeyboardListeners();
+    isRunning = false;
+    activeIdx = 0;
+    Object.keys(indices).forEach(idx => delete indices[idx]);
+  }
+
+  const onKeyup = (e) => {
+    e.preventDefault();
+    const dir = keyDirections[e.keyCode.toString()];
+    const idx = directions[dir];
+    delete indices[idx];
+    directions[dir] = 0;
+  }
+
+  const onKeydown = (e) => {
+    if (allowedKeys.includes(e.keyCode)) {
+      e.preventDefault();
+      const dir = keyDirections[e.keyCode.toString()];
+      if (activeIdx && directions[dir] === activeIdx) {
+        return;
+      }
+      activeIdx++;
+      directions[dir] = activeIdx;
+      indices[activeIdx] = dir;
+    }
+  }
+
+  const addKeyboardListeners = () => {
+    document.addEventListener('keydown', onKeydown);
+    document.addEventListener('keyup', onKeyup);
+  };
+
+  const removeKeyboardListeners = () => {
+    document.removeEventListener('keydown', onKeydown);
+    document.removeEventListener('keyup', onKeyup);
+  };
+
+  // editor UI
+
+  const getBoxLocation = (mouseEvent) => {
+    let startX = Math.floor(mouseEvent.offsetX - (mouseEvent.offsetX % width));
+    let startY = Math.floor(mouseEvent.offsetY - (mouseEvent.offsetY % height));
+    return [startX, startY];
+  }
+
+  const createUI = () => {
+    c.addEventListener('mousemove', e => {
+      if (isRunning) return;
+      // if this is commented-out, you can make some kinda-cool drawings on the canvas:
+      refreshCanvas();
+      const boxLocation = getBoxLocation(e).concat([width, height]);
+      ctx.beginPath();
+      ctx.rect(...boxLocation);
+      const idx = getRandom(charNames.length);
+      const img = chars[charNames[idx]];
+      ctx.drawImage(img, ...boxLocation);
+      // if (isDrawing) {
+      //   addToEditorMap(e, currentItem);
+      // }
+      ctx.stroke();
+    });
+
+    c.addEventListener('mousedown', () => {
+      // isDrawing = true;
+    });
+    c.addEventListener('mouseup', () => {
+      // isDrawing = false;
+    });
+    c.addEventListener('mouseout', () => {
+      // isDrawing = false;
+      refreshCanvas();
+    });
+    c.addEventListener('click', e => {
+      // addToEditorMap(e, currentItem);
+      refreshCanvas();
+    });
+  }
+
+  const runLoop = () => {
+    let currentDir = null;
+    while (activeIdx > 0 && !indices[activeIdx]) {
+      activeIdx--;
+    }
+    if (activeIdx > 0) {
+      currentDir = indices[activeIdx];
+    } else {
+      currentDir = null;
+    }
+    if (frame === 0) {
+      refreshCanvas(currentDir);
+      // console.warn(currentDir)
+      frame++;
+    } else if (frame < FRAME_MAX) {
+      frame++;
+    } else if (frame === FRAME_MAX) {
+      frame = 0;
+    }
+
+    if (isRunning) {
+      window.requestAnimationFrame(runLoop);
+    }
+  };
+</script>
+
+</html>

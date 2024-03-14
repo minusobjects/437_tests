@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 14" style="background:red">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: yellow;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="m0,2v-1h1v1H0Zm0,2v-1h1v1H0Zm0,2v-1h1v1H0Zm0,2v-1h1v1H0Zm0,2v-1h1v1H0Zm0,2v-1h1v1H0Zm0,1h1v1H0v-1ZM1,0h1v1h-1V0Zm0,2h1v1h-1v-1Zm0,2h1v1h-1v-1Zm0,2h1v1h-1v-1Zm0,3v-1h1v1h-1Zm0,1h1v1h-1v-1Zm0,2h1v1h-1v-1ZM3,1v1h-1v-1h1Zm0,2v1h-1v-1h1Zm0,2v1h-1v-1h1Zm0,2v1h-1v-1h1Zm0,2v1h-1v-1h1Zm0,2v1h-1v-1h1Zm0,2v1h-1v-1h1ZM3,0h1v1h-1V0Zm0,2h1v1h-1v-1Zm0,2h1v1h-1v-1Zm0,2h1v1h-1v-1Zm0,2h1v1h-1v-1Zm0,2h1v1h-1v-1Zm0,2h1v1h-1v-1ZM4,1h1v1h-1v-1Zm0,3v-1h1v1h-1Zm0,2v-1h1v1h-1Zm0,1h1v1h-1v-1Zm0,2h1v1h-1v-1Zm0,2h1v1h-1v-1Zm0,2h1v1h-1v-1ZM6,1h-1V0h1v1Zm0,2h-1v-1h1v1Zm0,1v1h-1v-1h1Zm0,2v1h-1v-1h1Zm0,3h-1v-1h1v1Zm0,2h-1v-1h1v1Zm0,2h-1v-1h1v1Zm0-11v-1h1v1h-1Zm1,2h-1v-1h1v1Zm-1,1h1v1h-1v-1Zm0,2h1v1h-1v-1Zm0,3v-1h1v1h-1Zm0,2v-1h1v1h-1Zm0,2v-1h1v1h-1ZM8,1h-1V0h1v1Zm0,1v1h-1v-1h1Zm0,2v1h-1v-1h1Zm0,2v1h-1v-1h1Zm0,3h-1v-1h1v1Zm0,1v1h-1v-1h1Zm0,2v1h-1v-1h1Z"/>
+</svg>

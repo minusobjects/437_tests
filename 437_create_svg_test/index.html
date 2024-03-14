@@ -1,0 +1,42 @@
+<html>
+<head>
+  <title>Test SVG Creation</title>
+  <link rel="stylesheet" href="../437-tests.css">
+</head>
+<body>
+  <div id="navBlock"><a href="../index.html">&lt;&lt;</a></div>
+  <canvas id="theCanvas" class="canvas-border" width="400" height="300"></canvas>
+</body>
+<script>
+  var c = document.getElementById("theCanvas");
+  var ctx = c.getContext("2d");
+
+  // svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
+  const svgns = 'http://www.w3.org/2000/svg';
+  const newSvg = document.createElementNS(svgns, 'svg');
+  newSvg.setAttribute('fill', 'orange');
+  newSvg.setAttribute('viewBox', '0 0 8 14');
+  const newPath = document.createElementNS(svgns, 'path');
+  newPath.setAttribute(
+    'd',
+    "m0,10.01V3.01h1v-1h5v1h1v5h-1v1h-3v-4h2v-2h-3v7h4v1H1v-1H0Z"
+  );
+  newSvg.appendChild(newPath);
+
+  const svgData = new XMLSerializer().serializeToString(newSvg);
+  const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const svgImg = new Image();
+  svgImg.src = url;
+  svgImg.onload = function () {
+    ctx.drawImage(svgImg, 0, 0, 32, 56);
+    ctx.drawImage(svgImg, 0, 112, 16, 28);
+    ctx.drawImage(svgImg, 16, 112, 16, 28);
+    ctx.drawImage(svgImg, 32, 112, 16, 28);
+    ctx.drawImage(svgImg, 48, 112, 16, 28);
+    ctx.drawImage(svgImg, 64, 112, 16, 28);
+    ctx.drawImage(svgImg, 96, 112, 16, 28);
+  }
+</script>
+</html>

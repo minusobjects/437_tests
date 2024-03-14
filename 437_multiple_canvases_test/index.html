@@ -1,0 +1,201 @@
+<html>
+<head>
+  <title>Test Multiple Canvases</title>
+  <link rel="stylesheet" href="../437-tests.css">
+  <style>
+    #container {
+      width: 4000px;
+      height: 2200px;
+      background: #888;
+    }
+  </style>
+</head>
+<body>
+  <div id="navBlock"><a href="../index.html">&lt;&lt;</a></div>
+  <div id="container">
+    <canvas id="canvas_01" width="960" height="532"></canvas>
+    <canvas id="canvas_02" width="960" height="532"></canvas>
+    <canvas id="canvas_03" width="960" height="532"></canvas>
+    <canvas id="canvas_04" width="960" height="532"></canvas>
+    <canvas id="canvas_05" width="960" height="532"></canvas>
+    <canvas id="canvas_06" width="960" height="532"></canvas>
+    <canvas id="canvas_07" width="960" height="532"></canvas>
+    <canvas id="canvas_08" width="960" height="532"></canvas>
+    <canvas id="canvas_09" width="960" height="532"></canvas>
+    <canvas id="canvas_10" width="960" height="532"></canvas>
+    <canvas id="canvas_11" width="960" height="532"></canvas>
+    <canvas id="canvas_12" width="960" height="532"></canvas>
+    <canvas id="canvas_13" width="960" height="532"></canvas>
+    <canvas id="canvas_14" width="960" height="532"></canvas>
+    <canvas id="canvas_15" width="960" height="532"></canvas>
+    <canvas id="canvas_16" width="960" height="532"></canvas>
+  </div>
+</body>
+<script>
+  const charNames = [
+    '263a',
+    '263b',
+    '2665',
+    '2666',
+    '2663',
+    '2660',
+    '2022',
+    '25d8',
+    '25cb',
+    '25d9',
+    '2642',
+    '2640',
+    '266a',
+    '266b',
+    '263c',
+    '25ba',
+    '25c4',
+    '2195',
+    '203c',
+    '00b6',
+    '00a7',
+    '25ac',
+    '21a8',
+    '2191',
+    '2193',
+    '2192',
+    '2190',
+    '221f',
+    '2194',
+    '25b2',
+    '25bc',
+    '\!',
+    '\"',
+    '_pnd',
+    '\$',
+    '\%',
+    '\&',
+    '\'',
+    '\(',
+    '\)',
+    '\*',
+    '\+',
+    '\,',
+    '\-',
+    '_dot',
+    '_fsl',
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '_col',
+    '\;',
+    '\<',
+    '\=',
+    '\>',
+    '_que',
+    '\@',
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+  ];
+
+  let loadCounter = 0;
+
+  const incrementLoadCounter = (name) => {
+    loadCounter++;
+    if (loadCounter === charNames.length) {
+      window.requestAnimationFrame(drawOnAllCanvases);
+    }
+  };
+
+  const chars = {};
+
+  charNames.forEach((name) => {
+    const img = new Image();
+    img.onload = () => {
+      incrementLoadCounter(name);
+    }
+    img.src = `../letter_svgs/${name}.svg`;
+    chars[name] = img;
+  });
+
+  const c_01 = document.getElementById("canvas_01");
+  const ctx_01 = c_01.getContext("2d");
+  const c_02 = document.getElementById("canvas_02");
+  const ctx_02 = c_02.getContext("2d");
+  const c_03 = document.getElementById("canvas_03");
+  const ctx_03 = c_03.getContext("2d");
+  const c_04 = document.getElementById("canvas_04");
+  const ctx_04 = c_04.getContext("2d");
+  const c_05 = document.getElementById("canvas_05");
+  const ctx_05 = c_05.getContext("2d");
+  const c_06 = document.getElementById("canvas_06");
+  const ctx_06 = c_06.getContext("2d");
+  const c_07 = document.getElementById("canvas_07");
+  const ctx_07 = c_07.getContext("2d");
+  const c_08 = document.getElementById("canvas_08");
+  const ctx_08 = c_08.getContext("2d");
+  const c_09 = document.getElementById("canvas_09");
+  const ctx_09 = c_09.getContext("2d");
+  const c_10 = document.getElementById("canvas_10");
+  const ctx_10 = c_10.getContext("2d");
+  const c_11 = document.getElementById("canvas_11");
+  const ctx_11 = c_11.getContext("2d");
+  const c_12 = document.getElementById("canvas_12");
+  const ctx_12 = c_12.getContext("2d");
+  const c_13 = document.getElementById("canvas_13");
+  const ctx_13 = c_13.getContext("2d");
+  const c_14 = document.getElementById("canvas_14");
+  const ctx_14 = c_14.getContext("2d");
+  const c_15 = document.getElementById("canvas_15");
+  const ctx_15 = c_15.getContext("2d");
+  const c_16 = document.getElementById("canvas_16");
+  const ctx_16 = c_16.getContext("2d");
+
+  const contexts = [
+    ctx_01, ctx_02, ctx_03, ctx_04,
+    ctx_05, ctx_06, ctx_07, ctx_08,
+    ctx_09, ctx_10, ctx_11, ctx_12,
+    ctx_13, ctx_14, ctx_15, ctx_16
+  ]
+
+  const width = 8;
+  const height = 14;
+  // const xAmt = 120;
+  // const yAmt = 38;
+  const xAmt = 60;
+  const yAmt = 20;
+
+  const drawStuff = (ctx) => {
+    for (let y = 0; y < yAmt; y++) {
+      for (let x = 0; x < xAmt; x++) {
+        const idx = Math.floor(Math.random() * charNames.length);
+        const img = chars[charNames[idx]];
+        ctx.drawImage(img, x * width, y * height, width, height);
+      }
+    }
+  }
+
+  const drawOnAllCanvases = () => {
+    contexts.forEach((ctx) => {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+      drawStuff(ctx);
+    })
+    window.requestAnimationFrame(drawOnAllCanvases);
+  }
+</script>
+</html>

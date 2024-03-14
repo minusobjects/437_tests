@@ -1,0 +1,178 @@
+<html>
+<head>
+  <title>437 4K Reduced, Take 2</title>
+  <link rel="stylesheet" href="../437-tests.css">
+</head>
+<body>
+  <div id="navBlock"><a href="../index.html">&lt;&lt;</a></div>
+  <canvas id="theCanvas" width="3840" height="2160"></canvas>
+</body>
+<script>
+  const charNames = [
+    '263a',
+    '263b',
+    '2665',
+    '2666',
+    '2663',
+    '2660',
+    '2022',
+    '25d8',
+    '25cb',
+    '25d9',
+    '2642',
+    '2640',
+    '266a',
+    '266b',
+    '263c',
+    '25ba',
+    '25c4',
+    '2195',
+    '203c',
+    '00b6',
+    '00a7',
+    '25ac',
+    '21a8',
+    '2191',
+    '2193',
+    '2192',
+    '2190',
+    '221f',
+    '2194',
+    '25b2',
+    '25bc',
+    '\!',
+    '\"',
+    '_pnd',
+    '\$',
+    '\%',
+    '\&',
+    '\'',
+    '\(',
+    '\)',
+    '\*',
+    '\+',
+    '\,',
+    '\-',
+    '_dot',
+    '_fsl',
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '_col',
+    '\;',
+    '\<',
+    '\=',
+    '\>',
+    '_que',
+    '\@',
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+  ];
+
+  let loadCounter = 0;
+
+  // Note: there seems to be a bug in Chrome that keeps these console messages from showing sometimes
+  const incrementLoadCounter = (name) => {
+    loadCounter++;
+    if (loadCounter === charNames.length) {
+      console.warn('loading finished, will draw');
+      drawInitial();
+      console.warn('drawing finished, will start animation');
+      window.requestAnimationFrame(animationLoop)
+    }
+  };
+
+  const chars = {};
+
+  charNames.forEach((name) => {
+    const img = new Image();
+    img.onload = () => {
+      incrementLoadCounter(name);
+    }
+    img.src = `../letter_svgs/${name}.svg`;
+    chars[name] = img;
+  });
+
+  const c = document.getElementById("theCanvas");
+  const ctx = c.getContext("2d");
+
+  const width = 8;
+  const height = 14;
+
+  const getRandom = (max) => {
+    return Math.floor(Math.random() * max);
+  }
+
+  const drawInitial = () => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    const xAmt = 480;
+    const yAmt = 154;
+    for (let y = 0; y < yAmt; y++) {
+      for (let x = 0; x < xAmt; x++) {
+        const idx = getRandom(charNames.length);
+        const img = chars[charNames[idx]];
+        ctx.drawImage(img, x * width, y * height, width, height);
+      }
+    }
+  }
+
+  const drawSingleRandomCharacter = (x, y) => {
+    const idx = getRandom(charNames.length);
+    const img = chars[charNames[idx]];
+    ctx.drawImage(img, x, y, width, height);
+  }
+
+  const generateInitialCoords = () => {
+    const result = [];
+    for (let n = 0; n < 100; n++) {
+      const x = getRandom(480);
+      const y = getRandom(154);
+      result.push([x * width, y * height]);
+    }
+    return result;
+  }
+
+  const initialCoords = generateInitialCoords();
+
+  const changeChars = () => {
+    // now, let's try 100 rectangles of 50 each
+    for(let n = 0; n < 100; n++) {
+      const x = initialCoords[n][0];
+      const y = initialCoords[n][1];
+      ctx.clearRect(x, y, width * 10, height * 5);
+      for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 10; col++) {
+          let xCoord = x + (col * width);
+          let yCoord = y + (row * height);
+          drawSingleRandomCharacter(xCoord, yCoord);
+        }
+      }
+    }
+  }
+
+  const animationLoop = () => {
+    changeChars();
+    window.requestAnimationFrame(animationLoop);
+  }
+</script>
+</html>

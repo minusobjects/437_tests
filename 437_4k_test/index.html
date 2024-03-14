@@ -1,0 +1,163 @@
+<html>
+<head>
+  <title>Test 437 4K on Canvas</title>
+  <link rel="stylesheet" href="../437-tests.css">
+</head>
+<body>
+  <div id="navBlock"><a href="../index.html">&lt;&lt;</a></div>
+  <canvas id="theCanvas" width="3840" height="2160"></canvas>
+  <!-- <canvas id="theCanvas" width="960" height="532"></canvas> -->
+</body>
+<script>
+  const charNames = [
+    '263a',
+    '263b',
+    '2665',
+    '2666',
+    '2663',
+    '2660',
+    '2022',
+    '25d8',
+    '25cb',
+    '25d9',
+    '2642',
+    '2640',
+    '266a',
+    '266b',
+    '263c',
+    '25ba',
+    '25c4',
+    '2195',
+    '203c',
+    '00b6',
+    '00a7',
+    '25ac',
+    '21a8',
+    '2191',
+    '2193',
+    '2192',
+    '2190',
+    '221f',
+    '2194',
+    '25b2',
+    '25bc',
+    '\!',
+    '\"',
+    '_pnd',
+    '\$',
+    '\%',
+    '\&',
+    '\'',
+    '\(',
+    '\)',
+    '\*',
+    '\+',
+    '\,',
+    '\-',
+    '_dot',
+    '_fsl',
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '_col',
+    '\;',
+    '\<',
+    '\=',
+    '\>',
+    '_que',
+    '\@',
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+  ];
+  
+  let loadCounter = 0;
+
+  const incrementLoadCounter = (name) => {
+    loadCounter++;
+    if (loadCounter === charNames.length) {
+      window.requestAnimationFrame(goGo);
+    }
+  };
+
+  const chars = {};
+
+  charNames.forEach((name) => {
+    const img = new Image();
+    img.onload = () => {
+      incrementLoadCounter(name);
+    }
+    img.src = `../letter_svgs/${name}.svg`;
+    chars[name] = img;
+  });
+
+  const c = document.getElementById("theCanvas");
+  const ctx = c.getContext("2d");
+
+  // canvas width = "3840", canvas height = "2160"
+
+  // char WxH = 32x56
+  // const width = 32;
+  // const height = 56;
+  // moves fast but it's big
+  // const xAmt = 120;
+  // const yAmt = 38;
+
+  // char WxH = 16x28
+  // const width = 16;
+  // const height = 28;
+  // 240 across, a bit more than 77 down
+  // too slow?
+  // const xAmt = 240;
+  // const yAmt = 77;
+
+  // char WxH = 8x14
+  const width = 8;
+  const height = 14;
+  // this does seem to move pretty slow...
+  const xAmt = 480;
+  const yAmt = 154;
+
+  // MEOW - maybe i can use multiple canvases? yeah, think so.
+  // <canvas id="theCanvas" width="960" height="532"></canvas>
+  // works well with 8x14:
+  // const xAmt = 120;
+  // const yAmt = 38;
+
+  const drawStuff = () => {
+    for (let y = 0; y < yAmt; y++) {
+      for (let x = 0; x < xAmt; x++) {
+        const idx = Math.floor(Math.random() * charNames.length);
+        const img = chars[charNames[idx]];
+        ctx.drawImage(img, x * width, y * height, width, height);
+      }
+    }
+  }
+
+  const goGo = () => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    drawStuff();
+    window.requestAnimationFrame(goGo);
+  }
+
+</script>
+</html>
